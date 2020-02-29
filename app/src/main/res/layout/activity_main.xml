@@ -24,6 +24,7 @@
             android:background="@drawable/boder"
             android:layout_weight="1"/>
         <Button
+            android:id="@+id/resetLineBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="重置航线"
@@ -36,7 +37,7 @@
         android:id="@+id/tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="hhhhhhhhhhhh"
+        android:text="经度:纬度:海拔:m"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
