@@ -8,4 +8,11 @@
 2. 第三个按钮出现之后，没有及时意识到前面两个按钮的监听事件也要做相应的修改
 
 ## 三 调试版app下载链接
-蓝奏云[https://www.lanzous.com/i9t1h5g](https://www.lanzous.com/i9t1h5g "蓝奏云")
+* 最新版本蓝奏云下载地址[https://www.lanzous.com/i9tfzkd](https://www.lanzous.com/i9tfzkd)
+* 旧版本蓝奏云下载地址[https://www.lanzous.com/i9t1h5g](https://www.lanzous.com/i9t1h5g "蓝奏云")
+
+## 更新日志
+
+2020-03-01 9:33:30 
+
+* 修复了一个空指针异常导致程序闪退的bug

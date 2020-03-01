@@ -293,8 +293,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mStartButton.setEnabled(true);
                 mStartButton.setBackgroundResource(R.drawable.boder);//改变背景
 
-                firstPosition=list.get(0);
-                moveMarker.setPosition(firstPosition);//将飞机放回开始的位置
+                if(list!=null&&list.size()!=0)
+                {
+                    firstPosition=list.get(0);
+                    moveMarker.setPosition(firstPosition);//将飞机放回开始的位置
+                }
+                else
+                {
+                   List<LatLng> l=readLatLngs();
+                   firstPosition=l.get(0);
+                    moveMarker.setPosition(firstPosition);//将飞机放回开始的位置
+                }
+
                 moveMarker.stopMove();//停止运动
                 mMarkerStatus = FINISH_STATUS;//将状态设为结束状态
                 mStartButton.setText("开始");
