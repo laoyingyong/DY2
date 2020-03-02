@@ -30,6 +30,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button resetBtn;//重置按钮
     private Button resetLineBtn;//重置航线
     private TextView tv;
-    private AlertDialog alertDialog;//重置导航线的对话框
+    private AlertDialog alertDialog;
     private AlertDialog.Builder builder;
     private SmoothMoveMarker moveMarker;
 
@@ -143,13 +144,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             b.include(points.get(i));
             aMap.addMarker(new MarkerOptions().position(points.get(i)).title("北京").snippet("DefaultMarker"));
         }
+
+
+
         LatLngBounds bounds = b.build();
         aMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
 
         moveMarker = new SmoothMoveMarker(aMap);
 
         moveMarker.setDescriptor(BitmapDescriptorFactory.fromResource(R.drawable.plane2));// 设置图标为无人机图标
-
 
 
         moveMarker.setPoints(points);//设置平滑移动的轨迹list
@@ -322,150 +325,66 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.resetLineBtn:
-                alertDialog=null;
-                final String[] menu = new String[]{"北京", "天津", "石家庄", "济南","郑州"};
-                //定义一个用来记录个列表项状态的boolean数组
-                array = new boolean[]{false, false, false, false,false};
+                aMap.clear();//从地图上删除所有的overlay（marker，circle，polyline 等对象）
+                list=null;
+                list=new ArrayList<LatLng>();
 
-                final int [] arr=new int[5];//记录选择顺序的数组
-                builder=new AlertDialog.Builder(MainActivity.this);
-                alertDialog=builder.setTitle("重置航线").
-                        setMultiChoiceItems(menu, array, new DialogInterface.OnMultiChoiceClickListener()
-                        {
-                            int count=0;
-                            @Override
-                            public void onClick(DialogInterface dialog, int which, boolean isChecked)
-                            {
-
-                                count++;//每点击一次计数器就加1
-                                array[which] = isChecked;
-                                arr[which]=count;//把计数器的值赋给指定的元素
-
-                            }
-                        }).
-
-                        setPositiveButton("确定", new DialogInterface.OnClickListener()
+                AMap.OnMapClickListener markerClickListener = new AMap.OnMapClickListener()//为地图设置单击监听器
                 {
+                    int count=0;
                     @Override
-                    public void onClick(DialogInterface dialog, int which) //确认按钮的点击事件
+                    public void onMapClick(LatLng latLng)
                     {
-                        String result = "";
-                        for (int i = 0; i < array.length; i++)
-                        {
-                            if (array[i])
-                            {
-                                if(i==array.length-1)//如果是最后一个元素就不加空格
+                        count++;
+                        Marker mark = aMap.addMarker(new MarkerOptions().position(latLng).title(""+count).snippet("DefaultMarker"));//在地图上添加标记
+                        list.add(latLng);//把当前点击的点加入到飞行点的集合当中
+                        builder=new AlertDialog.Builder(MainActivity.this);
+                        builder.setTitle("是否结束添加飞行点？")
+                                .setPositiveButton("结束添加", new DialogInterface.OnClickListener()
                                 {
-                                    result += menu[i];
-                                }
-                                else
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which)
+                                    {
+                                       aMap.setOnMapClickListener(null);//移除地图单击事件
+
+                                        //在地图上添加一个折线对象（polyline）对象
+                                        aMap.addPolyline(new PolylineOptions().setCustomTexture(BitmapDescriptorFactory.fromResource(R.drawable.blueiconfour)) //setCustomTextureList(bitmapDescriptors)
+                                                .addAll(list)
+                                                .useGradient(true)
+                                                .width(18));
+
+
+                                        LatLngBounds.Builder b = LatLngBounds.builder();
+                                        for (int i = 0; i < list.size(); i++)
+                                        {
+                                            b.include(list.get(i));
+                                        }
+                                        LatLngBounds bounds = b.build();
+                                        aMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
+
+                                        moveMarker=new SmoothMoveMarker(aMap);
+                                        moveMarker.setDescriptor(BitmapDescriptorFactory.fromResource(R.drawable.plane2));// 设置图标为无人机图标
+                                        moveMarker.setPoints(list);//设置平滑移动的轨迹list
+                                        moveMarker.setTotalDuration(10);//设置平滑移动的总时间
+                                        listener();
+
+                                    }
+                                })
+                                .setNegativeButton("继续添加", new DialogInterface.OnClickListener()
                                 {
-                                    result += menu[i] + " ";
-                                }
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which)
+                                    {
 
-                            }
-
-                        }
-
-                        String[] split=null;
-
-                        try {
-                            if(result.contains(" "))
-                            {
-                                split = result.split(" ");
-                            }
-                        } catch (Exception e) {
-                            System.out.println(e);
-                        }
-
-                        if(split!=null&&split.length==5)//如果五个选项全部选择了,就进行排序操作
-                        {
-                            int num=arr[0];
-                            split[num-1]="北京";
-                            int num2=arr[1];
-                            split[num2-1]="天津";
-                            int num3=arr[2];
-                            split[num3-1]="石家庄";
-                            int num4=arr[3];
-                            split[num4-1]="济南";
-                            int num5=arr[4];
-                            split[num5-1]="郑州";
-                        }
-
-
-                        list = new ArrayList<LatLng>();
-                        for (int i = 0; split!=null&&i < split.length; i++)
-                        {
-                            String s=split[i];
-
-                            if(s.equals("天津"))
-                            {
-                                list.add(new LatLng(39.0851000000,117.1993700000));
-                            }
-                            if(s.equals("北京"))
-                            {
-                                list.add(new LatLng(39.97617053371078,116.3499049793749));
-
-                            }
-                            if(s.equals("石家庄"))
-                            {
-                                list.add(new LatLng(38.0427600000,114.5143000000));
-                            }
-                            if(s.equals("济南"))
-                            {
-                                list.add(new LatLng( 36.6331621000,117.1334838900));
-                            }
-                            if(s.equals("郑州"))
-                            {
-                                list.add(new LatLng( 34.7472500000, 113.6249300000));
-                            }
-                        }
-
-
-
-                        aMap.clear();//从地图上删除所有的overlay（marker，circle，polyline 等对象）
-                        aMap.removecache();//删除地图缓存
-
-                        for (LatLng latLng : list)
-                        {
-                            aMap.addMarker(new MarkerOptions().position(latLng).title("北京").snippet("DefaultMarker"));
-                        }
-                        //在地图上添加一个折线对象（polyline）对象
-                        aMap.addPolyline(new PolylineOptions().setCustomTexture(BitmapDescriptorFactory.fromResource(R.drawable.blueiconfour)) //setCustomTextureList(bitmapDescriptors)
-                                .addAll(list)
-                                .useGradient(true)
-                                .width(18));
-
-
-                        LatLngBounds.Builder b = LatLngBounds.builder();
-                        for (int i = 0; i < list.size(); i++)
-                        {
-                            b.include(list.get(i));
-                        }
-                        LatLngBounds bounds = b.build();
-                        aMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
-
-                        moveMarker=new SmoothMoveMarker(aMap);
-                        moveMarker.setDescriptor(BitmapDescriptorFactory.fromResource(R.drawable.plane2));// 设置图标为无人机图标
-                        moveMarker.setPoints(list);//设置平滑移动的轨迹list
-                        moveMarker.setTotalDuration(10);//设置平滑移动的总时间
-                        listener();
-                        if(list.size()!=5)
-                        {
-                            Toast.makeText(getApplicationContext(), "重置失败，因为选项没选完！", Toast.LENGTH_LONG).show();
-                        }
-
+                                    }
+                                })
+                                .create().show();
 
                     }
-                }).setNegativeButton("取消", new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) //取消按钮的点击事件
-                    {
+                };
+                aMap.setOnMapClickListener(markerClickListener);//为地图绑定单击事件
 
-                    }
-                }).create();
-                alertDialog.show();
+
                 break;
 
                 default:
@@ -473,9 +392,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     }
-
-
-
 
 
     private void listener()
