@@ -142,7 +142,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         for (int i = 0; i < points.size(); i++)
         {
             b.include(points.get(i));
-            aMap.addMarker(new MarkerOptions().position(points.get(i)).title("北京").snippet("DefaultMarker"));
+            Marker marker = aMap.addMarker(new MarkerOptions().position(points.get(i)).title("北京").snippet("DefaultMarker"));
+            marker.setInfoWindowEnable(false);//禁用标记点的infoWindow
         }
 
 
@@ -337,6 +338,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     {
                         count++;
                         Marker mark = aMap.addMarker(new MarkerOptions().position(latLng).title(""+count).snippet("DefaultMarker"));//在地图上添加标记
+                        mark.setInfoWindowEnable(false);//禁用标记点
                         list.add(latLng);//把当前点击的点加入到飞行点的集合当中
                         builder=new AlertDialog.Builder(MainActivity.this);
                         builder.setTitle("是否结束添加飞行点？")
