@@ -3,6 +3,8 @@ package com.example.demo2;
 
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -27,10 +29,14 @@ import com.amap.api.maps.utils.SpatialRelationUtil;
 import com.amap.api.maps.utils.overlay.SmoothMoveMarker;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener
@@ -40,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private AMap aMap;
 
     private LatLng firstPosition;
+    private TextView tv2;
 
     private Button mStartButton;
     private Button resetBtn;//重置按钮
@@ -48,8 +55,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private AlertDialog alertDialog;
     private AlertDialog.Builder builder;
     private SmoothMoveMarker moveMarker;
+    private Timer timer;
 
     private List<LatLng> list=null;//地点的集合
+
 
 
     private boolean [] array;
@@ -74,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mapView = (MapView) findViewById(R.id.map);
         mStartButton =findViewById(R.id.startBtn);
         tv=findViewById(R.id.tv);//显示经纬度信息的文本框
+        tv2=findViewById(R.id.tv2);
         resetBtn=findViewById(R.id.resetBtn);//重置按钮实例化
         resetLineBtn=findViewById(R.id.resetLineBtn);
         mStartButton.setOnClickListener(this);
@@ -84,6 +94,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mapView.onCreate(savedInstanceState);// 此方法必须重写
         init();
         initMoveMarker();
+
 
     }
 
@@ -158,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         moveMarker.setPoints(points);//设置平滑移动的轨迹list
         moveMarker.setTotalDuration(10);//设置平滑移动的总时间
+
 
         listener();
     }//初始化move end
@@ -250,6 +262,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 if (mMarkerStatus == START_STATUS)
                 {
+
+                    startNewThread();
                     mStartButton.setEnabled(false);//禁用按钮
                     mStartButton.setBackgroundResource(R.drawable.background);//改变背景
                     moveMarker.startSmoothMove();
@@ -271,6 +285,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else if (mMarkerStatus == FINISH_STATUS)//到达终点
                 {
 
+                    startNewThread();
                     mStartButton.setEnabled(false);//禁用按钮
                     mStartButton.setBackgroundResource(R.drawable.background);//改变背景
                     moveMarker.setPosition(new LatLng(39.97617053371078, 116.3499049793749));//开始的位置
@@ -294,6 +309,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.resetBtn://重置按钮
+                if(timer!=null)
+                {
+                    float totalDistance;
+                    timer.cancel();
+                    if(list==null)
+                    {
+                        totalDistance = Util.getTotalDistance(readLatLngs());
+                    }
+                    else
+                    {
+                        totalDistance = Util.getTotalDistance(list);
+                    }
+
+                    tv2.setText("距离终点"+totalDistance+"米");
+                }
                 mStartButton.setEnabled(true);
                 mStartButton.setBackgroundResource(R.drawable.boder);//改变背景
 
@@ -455,6 +485,58 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 });
         moveMarker.getMarker().showInfoWindow();
+    }
+
+
+    private void startNewThread()
+    {
+        timer=new Timer();
+
+        final Handler handler=new Handler()
+        {
+            float pastTime=0.0f;
+            float leftDis=Util.getLeftDistance(Util.getTotalDistance(readLatLngs()),10.0f,pastTime);
+            @Override
+            public void handleMessage(Message msg)
+            {
+                if (msg.what==0x1233)//如果消息是本程序所发送的
+                {
+                    pastTime=pastTime+0.5f;
+                    float totalDistance;
+                    if(list==null)
+                    {
+                        totalDistance = Util.getTotalDistance(readLatLngs());
+                    }
+                    else
+                    {
+                        totalDistance = Util.getTotalDistance(list);
+                    }
+
+                    leftDis = Util.getLeftDistance(totalDistance, 10.0f, pastTime);
+                    tv2.setText("距离终点"+leftDis+"米");
+                    if(leftDis<=0.0f)
+                    {
+                        timer.cancel();//如果距离小于等于0了，就销毁该线程
+                    }
+                }
+
+            }
+        };
+
+        //使用定时器，每隔1000毫秒发送一个消息
+        timer.schedule(new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                Message message=new Message();
+                message.what=0x1233;
+                handler.sendMessage(message);
+
+            }
+        },0,500);
+
+
     }
 
 

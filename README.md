@@ -9,8 +9,8 @@
 3. 本程序不适合X86系统，没能在AS自带的虚拟机上调试。另外因为电脑usb接口坏了，只能将程序发到手机上测试，故无法看到程序运行中IED打印的日志信息。期间遇到什么异常都无法得知，只能猜测。
 
 ## 三 调试版app下载链接
-* 最新版本蓝奏云下载地址（2020-03-03 11:50:43 更新）[https://www.lanzous.com/i9w4myb](https://www.lanzous.com/i9w4myb)
-* 旧版本蓝奏云下载地址[https://www.lanzous.com/i9vnehe](https://www.lanzous.com/i9vnehe)
+* 最新版本（2020-03-03 18:25:01更新 ）[https://www.lanzous.com/i9wnc7i](https://www.lanzous.com/i9wnc7i)
+* 旧版本蓝奏云下载地址（2020-03-03 11:50:43 更新）[https://www.lanzous.com/i9w4myb](https://www.lanzous.com/i9w4myb)
 
 
 ## 更新日志
@@ -27,3 +27,7 @@
 2020-03-03 11:47:10 
 
 * 飞行过程中不允许点选航点，这样也就避免了飞行的提示信息会跑到航点处
+
+2020-03-03 18:23:54 
+
+* 每0.5秒更新一次距离终点的距离
