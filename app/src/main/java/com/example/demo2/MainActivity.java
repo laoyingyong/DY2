@@ -321,8 +321,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     {
                         totalDistance = Util.getTotalDistance(list);
                     }
+                    if(list==null)
+                    {
+                      tv2.setText("经度:"+Util.getPosStr(readLatLngs().get(0)).get(0)+"纬度:"+Util.getPosStr(readLatLngs().get(0)).get(1)+"离终点:"+totalDistance+"m");
+                    }
+                    else
+                    {
+                        tv2.setText("经度:"+Util.getPosStr(list.get(0)).get(0)+"纬度:"+Util.getPosStr(list.get(0)).get(1)+"离终点:"+totalDistance+"m");
+                    }
 
-                    tv2.setText("距离终点"+totalDistance+"米");
                 }
                 mStartButton.setEnabled(true);
                 mStartButton.setBackgroundResource(R.drawable.boder);//改变背景
@@ -503,27 +510,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 {
                     pastTime=pastTime+0.5f;
                     float totalDistance;
+                    ArrayList<String>   curL=null;
                     if(list==null)
                     {
                         totalDistance = Util.getTotalDistance(readLatLngs());
+                        curL= Util.getCurPos(readLatLngs(), totalDistance, 10.0f, pastTime);
                     }
                     else
                     {
                         totalDistance = Util.getTotalDistance(list);
+                         curL=Util.getCurPos(list,totalDistance,10.0f,pastTime)  ;
                     }
 
                     leftDis = Util.getLeftDistance(totalDistance, 10.0f, pastTime);
-                    tv2.setText("距离终点"+leftDis+"米");
-                    if(leftDis<=0.0f)
+
+                    tv2.setText("经度:"+curL.get(0)+"纬度:"+curL.get(1)+"离终点:"+leftDis+"m");
+                    if(leftDis==0.0f)
                     {
-                        timer.cancel();//如果距离小于等于0了，就销毁该线程
+                        timer.cancel();//如果距离等于0了，就销毁该线程
                     }
                 }
 
             }
         };
 
-        //使用定时器，每隔1000毫秒发送一个消息
+        //使用定时器，每隔200毫秒发送一个消息
         timer.schedule(new TimerTask()
         {
             @Override
