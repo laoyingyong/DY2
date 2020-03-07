@@ -9,7 +9,8 @@
 3. 本程序不适合X86系统，没能在AS自带的虚拟机上调试。另外因为电脑usb接口坏了，只能将程序发到手机上测试，故无法看到程序运行中IED打印的日志信息。期间遇到什么异常都无法得知，只能猜测。
 
 ## 三 调试版app下载链接
-* 最新版本（2020-03-03 22:07:33 更新）[https://www.lanzous.com/i9wwrje](https://www.lanzous.com/i9wwrje)
+* 最新版本（2020-03-07 23:11:12 更新）[https://www.lanzous.com/ia1alhe](https://www.lanzous.com/ia1alhe)
+* 旧版本（2020-03-03 22:07:33 更新）[https://www.lanzous.com/i9wwrje](https://www.lanzous.com/i9wwrje)
 * 旧版本（2020-03-03 18:25:01更新 ）[https://www.lanzous.com/i9wnc7i](https://www.lanzous.com/i9wnc7i)
 * 旧版本（2020-03-03 11:50:43 更新）[https://www.lanzous.com/i9w4myb](https://www.lanzous.com/i9w4myb)
 
