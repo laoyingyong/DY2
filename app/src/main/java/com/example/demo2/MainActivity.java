@@ -529,6 +529,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     {
                         timer.cancel();//如果距离等于0了，就销毁该线程
                     }
+                    if(leftDis<0)
+                    {
+                        List<LatLng> latLngArrayList=null;
+                        if (list==null)
+                        {
+                            latLngArrayList=readLatLngs();
+                        }
+                        else
+                        {
+                            latLngArrayList=list;
+                        }
+                        LatLng latLng = latLngArrayList.get(latLngArrayList.size() - 1);
+                        timer.cancel();
+                        tv2.setText("经度:"+Util.getPosStr(latLng).get(0)+"纬度:"+Util.getPosStr(latLng).get(1)+"离终点0m");
+
+                    }
                 }
 
             }
